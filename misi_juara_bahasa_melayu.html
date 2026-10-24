@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misi Juara Bahasa Melayu</title>
+<style>
+:root{--navy:#142e52;--blue:#2563eb;--gold:#fbbf24;--paper:#fff;--ink:#172033;--muted:#64748b;--green:#15803d;--red:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(145deg,#0e7490,#142e52 60%,#312e81);color:var(--ink);display:flex;justify-content:center;align-items:center;padding:18px}
+.app{width:min(100%,1000px);background:#f8fafc;border-radius:26px;overflow:hidden;box-shadow:0 20px 60px #0005}
+header{background:var(--navy);color:white;padding:20px 24px;text-align:center}
+.eyebrow{color:#fde68a;font-size:.85rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:7px 0}
+header p{margin:0;color:#dbeafe}
+main{padding:clamp(16px,4vw,32px)}
+.topline{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-weight:700;margin-bottom:14px}
+.progress{height:10px;background:#dbeafe;border-radius:99px;overflow:hidden;margin-bottom:24px}
+#progressFill{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#facc15);transition:width .25s}
+.panel{background:white;border:2px solid #e2e8f0;border-radius:20px;padding:clamp(18px,4vw,30px)}
+h2{font-size:clamp(1.35rem,3vw,2rem);margin:0 0 12px;color:var(--navy)}
+#question{font-size:clamp(1.15rem,2.7vw,1.65rem);line-height:1.45;margin:10px 0 22px}
+.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.answer{border:3px solid #cbd5e1;background:#f8fafc;border-radius:16px;padding:18px 16px;text-align:left;font-size:clamp(1rem,2vw,1.25rem);font-weight:750;color:var(--ink);cursor:pointer;min-height:72px;display:flex;align-items:center;gap:12px;transition:.15s}
+.answer .letter{flex:0 0 38px;height:38px;border-radius:11px;background:#dbeafe;color:#1d4ed8;display:grid;place-items:center;font-weight:900}
+.answer:hover,.answer:focus-visible{outline:none;border-color:var(--blue);background:#eff6ff;transform:translateY(-1px)}
+.answer.selected{border-color:var(--blue);background:#dbeafe;box-shadow:0 0 0 3px #2563eb22}
+.answer.correct{border-color:var(--green);background:#dcfce7}
+.answer.wrong{border-color:var(--red);background:#fee2e2}
+.feedback{display:none;margin-top:18px;padding:15px 17px;border-radius:14px;font-size:1.05rem;line-height:1.5}
+.feedback.show{display:block}
+.feedback.good{background:#dcfce7;color:#14532d}
+.feedback.bad{background:#fee2e2;color:#7f1d1d}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:22px}
+button.primary,button.secondary{border:0;border-radius:13px;padding:14px 22px;font-size:1rem;font-weight:800;cursor:pointer}
+button.primary{background:var(--blue);color:white}
+button.primary:disabled{background:#94a3b8;cursor:not-allowed}
+button.secondary{background:#e2e8f0;color:var(--navy)}
+#result{display:none;text-align:center}
+#result .trophy{font-size:4rem}
+#finalScore{font-size:clamp(2rem,6vw,4rem);font-weight:900;color:var(--navy);margin:6px}
+#resultText{font-size:1.2rem;line-height:1.5}
+footer{background:#eef2ff;padding:12px 20px;text-align:center;color:#475569;font-size:.9rem}
+kbd{display:inline-block;background:#fff;border:1px solid #cbd5e1;border-bottom-width:3px;border-radius:5px;padding:1px 6px;font-size:.8rem}
+@media(max-width:620px){.answers{grid-template-columns:1fr}.answer{min-height:60px;padding:12px}.app{border-radius:18px}body{padding:8px}}
+@media(min-width:900px){main{padding:32px 44px}.answer{min-height:90px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="eyebrow">🎮 Misi Pendidikan</div>
+  <h1>Misi Juara Bahasa Melayu</h1>
+  <p>Jawab soalan, kumpul bintang dan jadi juara ilmu!</p>
+</header>
+<main>
+  <div id="game">
+    <div class="topline"><span id="questionCount">Soalan 1 daripada 10</span><span>⭐ Mata: <strong id="score">0</strong></span></div>
+    <div class="progress"><div id="progressFill"></div></div>
+    <section class="panel">
+      <h2 id="stage">🌿 Hutan Ilmu</h2>
+      <div id="question">Bersedia untuk memulakan misi?</div>
+      <div class="answers" id="answers"></div>
+      <div id="feedback" class="feedback" aria-live="polite"></div>
+      <div class="actions">
+        <button class="secondary" id="restart">↻ Mula semula</button>
+        <button class="primary" id="next" disabled>Jawab dahulu →</button>
+      </div>
+    </section>
+  </div>
+  <section id="result" class="panel">
+    <div class="trophy" id="trophy">🏆</div>
+    <h2>Misi Selesai!</h2>
+    <div id="finalScore">0 / 10</div>
+    <p id="resultText"></p>
+    <button class="primary" id="playAgain">Main sekali lagi</button>
+  </section>
+</main>
+<footer>Tip TV: guna anak panah <kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> dan tekan <kbd>Enter</kbd> untuk memilih.</footer>
+</div>
+<script>
+const questions = [
+ {q:"Pilih kata nama am dalam ayat: “Adik membaca buku di bilik.”",a:["membaca","buku","di","dengan cepat"],c:1,e:"“Buku” ialah kata nama am yang menamakan benda."},
+ {q:"Ibu sedang _____ nasi di dapur.",a:["cantik","rajin","memasak","merah"],c:2,e:"“Memasak” ialah kata kerja yang menunjukkan perbuatan."},
+ {q:"Apakah penjodoh bilangan yang sesuai? “Seb _____ pisang.”",a:["utas","sisir","keping","utas-utas"],c:1,e:"“Sesisir pisang” digunakan untuk sekumpulan pisang yang bercantum."},
+ {q:"Pilih kata adjektif dalam ayat: “Rumah nenek sangat besar.”",a:["Rumah","nenek","sangat","besar"],c:3,e:"“Besar” menerangkan saiz rumah, jadi perkataan ini ialah kata adjektif."},
+ {q:"Pilih ejaan yang betul.",a:["perabut","perabot","perabott","perabud"],c:1,e:"Ejaan baku yang betul ialah “perabot”."},
+ {q:"Ali _____ bola di padang.",a:["bermain","permainan","mainan","dimainkan"],c:0,e:"“Bermain” ialah kata kerja yang sesuai dalam ayat ini."},
+ {q:"Pilih kata nama am.",a:["Kuala Lumpur","sekolah","Malaysia","Aminah"],c:1,e:"“Sekolah” ialah kata nama am. Nama khusus seperti Kuala Lumpur, Malaysia dan Aminah ialah kata nama khas."},
+ {q:"Dalam ayat “Siti menyiram pokok”, perkataan “menyiram” ialah kata kerja.",a:["Betul","Salah"],c:0,e:"“Menyiram” menunjukkan perbuatan yang dilakukan oleh Siti.",tf:true},
+ {q:"Dalam ayat “Baju itu berwarna biru”, perkataan “biru” ialah kata kerja.",a:["Betul","Salah"],c:1,e:"“Biru” ialah kata adjektif warna, bukannya kata kerja.",tf:true},
+ {q:"Amir bangun awal supaya tidak lewat ke sekolah. Mengapakah Amir bangun awal?",a:["Untuk bermain bola","Untuk memasak sarapan","Supaya tidak lewat ke sekolah","Untuk menonton televisyen"],c:2,e:"Ayat menyatakan bahawa Amir bangun awal supaya tidak lewat ke sekolah."}
+];
+let index=0,score=0,chosen=null,locked=false,focusIndex=0;
+const $=id=>document.getElementById(id);
+function render(){
+ const q=questions[index];chosen=null;locked=false;focusIndex=0;
+ $("questionCount").textContent=`Soalan ${index+1} daripada ${questions.length}`;
+ $("score").textContent=score;
+ $("progressFill").style.width=`${index/questions.length*100}%`;
+ $("stage").textContent=index<3?"🌿 Hutan Ilmu":index<7?"📚 Gua Tatabahasa":"🏆 Cabaran Juara";
+ $("question").textContent=q.q;
+ $("answers").innerHTML="";
+ q.a.forEach((answer,i)=>{
+   const b=document.createElement("button");b.className="answer";b.type="button";b.dataset.index=i;
+   b.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span>${answer}</span>`;
+   b.addEventListener("click",()=>selectAnswer(i));$("answers").appendChild(b);
+ });
+ $("feedback").className="feedback";$("feedback").textContent="";
+ $("next").disabled=true;$("next").textContent=index===questions.length-1?"Lihat keputusan 🏆":"Soalan seterusnya →";
+ $("game").style.display="block";$("result").style.display="none";
+ updateFocus();
+}
+function updateFocus(){
+ [...$("answers").children].forEach((b,i)=>{b.classList.toggle("selected",i===focusIndex&&!locked);});
+}
+function selectAnswer(i){
+ if(locked)return;
+ chosen=i;locked=true;const q=questions[index];const buttons=[...$("answers").children];
+ buttons.forEach((b,j)=>{b.disabled=true;b.classList.remove("selected");if(j===q.c)b.classList.add("correct");else if(j===i)b.classList.add("wrong");});
+ const good=i===q.c;if(good)score++;
+ $("score").textContent=score;
+ $("feedback").className="feedback show "+(good?"good":"bad");
+ $("feedback").textContent=(good?"⭐ Betul! ":"Belum tepat. ")+q.e;
+ $("next").disabled=false;$("next").focus();
+}
+function finish(){
+ $("game").style.display="none";$("result").style.display="block";
+ $("progressFill").style.width="100%";$("finalScore").textContent=`${score} / ${questions.length}`;
+ let msg=score>=9?"Hebat! Penguasaan Bahasa Melayu sangat baik.":score>=7?"Bagus! Terus berlatih untuk menjadi lebih mahir.":score>=5?"Usaha yang baik. Ulang kaji jawapan dan cuba lagi.":"Jangan putus asa. Belajar sedikit demi sedikit akan membantu.";
+ $("resultText").textContent=msg;
+ $("trophy").textContent=score>=8?"🏆":score>=5?"🥇":"🌟";
+ $("playAgain").focus();
+}
+$("next").addEventListener("click",()=>{if(!locked)return;if(index<questions.length-1){index++;render()}else finish()});
+$("restart").addEventListener("click",()=>{index=0;score=0;render()});
+$("playAgain").addEventListener("click",()=>{index=0;score=0;render()});
+document.addEventListener("keydown",e=>{
+ if($("result").style.display==="block"){if(e.key==="Enter"||e.key===" "){e.preventDefault();index=0;score=0;render()}return}
+ const count=questions[index].a.length;
+ if(["ArrowRight","ArrowDown"].includes(e.key)){e.preventDefault();focusIndex=(focusIndex+1)%count;updateFocus()}
+ if(["ArrowLeft","ArrowUp"].includes(e.key)){e.preventDefault();focusIndex=(focusIndex-1+count)%count;updateFocus()}
+ if(e.key==="Enter"||e.key===" "){if(!locked){e.preventDefault();selectAnswer(focusIndex)}}
+ if(e.key==="Escape"){index=0;score=0;render()}
+});
+render();
+</script>
+</body>
+</html>
